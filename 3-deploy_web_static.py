@@ -28,9 +28,9 @@ def do_deploy(archive_path):
     """Fabric script that distributes an archive to your web servers"""
     if exists(archive_path) is False:
         return False
-    file_archive = archive_path.split('/')[-1]
-    file_tgz = '/data/web_static/releases/' + "{}".format(file_archive.split('.')[0])
-    tmp = "/tmp/" + file_archive
+    fd = archive_path.split('/')[-1]
+    file_tgz = '/data/web_static/releases/' + "{}".format(fd.split('.')[0])
+    tmp = "/tmp/" + fd
 
     try:
         put(archive_path, "/tmp/")
