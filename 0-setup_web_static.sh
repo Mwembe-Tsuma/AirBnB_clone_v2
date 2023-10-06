@@ -44,7 +44,7 @@ sudo mkdir -p /data/web_static/releases/test/
 
 sudo mkdir -p /data/web_static/shared
 
-sudo echo 'fake html file' > /data/web_static/releases/test/index.html
+sudo echo 'fake html file' | sudo tee /data/web_static/releases/test/index.html
 
 sudo ln -sf /data/web_static/releases/test/ /data/web_static/current
 
