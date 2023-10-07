@@ -84,3 +84,11 @@ def do_deploy(archive_path):
         if update_lnk.failed:
             return False
     return True
+
+
+def deploy():
+    """creates and distributes an archive to our web server."""
+    archive_path = do_pack()
+    if not archive_path:
+        return False
+    return do_deploy(archive_path)
