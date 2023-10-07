@@ -29,6 +29,14 @@ def do_pack():
 
 
 def do_deploy(archive_path):
+    """Deploys static files to our web servers.
+
+    Atributes:
+        archive_path(str): path to archive with our static files.
+    Returns:
+        True(boolean): on success,
+        False(boolean): on fail.
+    """
     if not os.path.exists(archive_path):
         return False
 
