@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Module creates .tgz archive, distributes it to the web servers"""
+"""Module creates .tgz archive, distributes it to the web servers and cleans"""
 
 import os
 from fabric.api import local, cd, put, run, env
@@ -85,7 +85,6 @@ def do_deploy(archive_path):
             return False
     return True
 
-
 def deploy():
     """creates and distributes an archive to our web server."""
     archive_path = "versions/web_static_{}.tgz".format(
@@ -99,3 +98,22 @@ def deploy():
             return False
     else:
         return do_deploy(archive_path)
+
+def do_clean(number=0):
+    """deletes out-of-date archives"""
+    if number == '0' or 0:
+        number = 1
+    else:
+        number = int(number)
+
+    archives_rev_sorted = os.listdir('versions')
+    archives_rev_sorted.reverse()
+    for archive in archives_rev_sorted[number:]:
+        local("rm -rf {}".format(archive))
+
+    releases_path = '/data/web_static/releases/'
+    releases = run('ls -d {}web_static_*'.format(releases_path))
+    directories = releases.stdout.strip().split('\n')
+    directories.reverse()
+    for directory in directories[number:]:
+       run('rm -rf {}{}'.format(releases_path, directory))
