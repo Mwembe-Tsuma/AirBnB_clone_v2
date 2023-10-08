@@ -1,5 +1,7 @@
 # sets up web servers for deployment of web static
 
+include stdlib
+
 # Update package repositories
 exec { 'apt_update':
   command     => 'apt update -y',
@@ -10,12 +12,6 @@ exec { 'apt_update':
 # Install Nginx
 package { 'nginx':
   ensure => 'installed',
-}
-
-# Ensure Nginx service is running and enabled
-service { 'nginx':
-  ensure  => 'running',
-  enable  => true,
 }
 
 # Create an index.html file with "Hello World!"
@@ -29,8 +25,15 @@ file { '/etc/nginx/sites-available/default':
   ensure => present,
   # content => template('module_name/nginx_config.erb'), # You can use a template here
   content => "
+
 server {
     listen 80 default_server;
+    listen [::]:80 default_server;
+
+    root /var/www/html;
+
+    index index.html index.htm index.nginx-debian.html;
+
     server_name _;
 
     location /redirect_me {
@@ -43,7 +46,13 @@ server {
     }
 
     location /hbnb_static {
-        alias /data/web_static/current;
+        alias /data/web_static/current/;
+    }
+
+     location / {
+        # First attempt to serve request as file, then
+        # as directory, then fall back to displaying a 404.
+        try_files \$uri \$uri/ =404;
     }
 
     # Additional Nginx configuration here...
@@ -52,24 +61,56 @@ server {
 "
 }
 
+file {'/etc/nginx/conf.d/0-custom-header.conf':
+  ensure => present,
+  owner => 'ubuntu',
+  group => 'ubuntu',
+}
+
 # Configure custom HTTP response header
 file_line { 'headers_served_by':
   path    => '/etc/nginx/conf.d/0-custom-header.conf',
   line    => 'add_header X-Served-By $hostname;',
   match   => '^ENABLED=',
   ensure  => present,
-  create  => true,
+  # create  => true,
   require => File['/etc/nginx/sites-available/default'],
 }
 
-# Create directories and symbolic link for web_static
-file { '/data/web_static/releases/test/index.html':
-  ensure  => present,
-  content => 'fake html file',
+file { '/data/':
+  ensure    => 'directory',
+  owner     => 'ubuntu',
+  group     => 'ubuntu',
 }
 
-file { '/data/web_static/shared/':
+file { '/data/web_static/':
+  ensure    => 'directory',
+  owner     => 'ubuntu',
+  group     => 'ubuntu',
+}
+
+file { '/data/web_static/releases/':
+  ensure    => 'directory',
+  owner     => 'ubuntu',
+  group     => 'ubuntu',
+}
+
+file { '/data/web_static/releases/test/':
+  ensure    => 'directory',
+  owner     => 'ubuntu',
+  group     => 'ubuntu'
+}
+
+file { '/data/web_static/releases/test/index.html':
   ensure    => present,
+  content   => 'fake html file',
+  owner     => 'ubuntu',
+  group     => 'ubuntu',
+}
+
+
+file { '/data/web_static/shared/':
+  ensure    => 'directory',
   owner     => 'ubuntu',
   group     => 'ubuntu',
 }
@@ -78,12 +119,13 @@ file { '/data/web_static/current':
   ensure    => link,
   target    => '/data/web_static/releases/test',
   require   => File['/data/web_static/releases/test/index.html'],
+  owner     => 'ubuntu',
+  group     => 'ubuntu',
 }
 
 # Restart Nginx after configuration changes
 service { 'nginx':
-  ensure  => 'restarted',
+  ensure  => 'running',
   enable  => true,
   require => File_line['headers_served_by'],
 }
-
