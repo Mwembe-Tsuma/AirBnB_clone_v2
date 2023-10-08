@@ -2,7 +2,7 @@
 """Module creates .tgz archive, distributes it to the web servers and cleans"""
 
 import os
-from fabric.api import local, cd, put, run, env
+from fabric.api import local, cd, put, run, env, execute
 from datetime import datetime
 
 env.hosts = [
@@ -34,14 +34,23 @@ def do_deploy(archive_path):
     Atributes:
         archive_path(str): path to archive with our static files.
     Returns:
-        True(boolean): on success,
-        False(boolean): on fail.
+        True(bool): on success,
+        False(bool): on fail.
     """
     if not os.path.exists(archive_path):
         return False
 
     archive_name = os.path.basename(archive_path)
     archive_name_without_ext = os.path.splitext((archive_name))[0]
+
+    # Check if the target directory already exists in releases
+    path = '/data/web_static/releases/{}'.format(archive_name_without_ext)
+
+    releases = run('ls -d {}web_static_*'.format('/data/web_static/releases/'))
+    directories = [dir.strip() for dir in releases.stdout.strip().split('\n')]
+
+    if path in directories:
+        return True  # The archive is already deployed, nothing to do
 
     # Upload the archive to the /tmp/
     uploaded = put(archive_path, "/tmp/")
@@ -86,24 +95,31 @@ def do_deploy(archive_path):
     return True
 
 
-def deploy():
-    """creates and distributes an archive to our web server."""
-    archive_path = "versions/web_static_{}.tgz".format(
-        datetime.now().strftime("%Y%m%d%H%M%S")
-    )
+archive_created = False  # global variable to track archive createion
+archive_filename = None  # Gloable variable to store archive filename
 
-    if not os.path.exists(archive_path):
-        if do_pack():
-            return do_deploy(archive_path)
-        else:
+
+def deploy():
+    """Creates a single archive and deploys it to multiple web servers."""
+    global archive_created, archive_filename
+
+    # check if archive has already been created
+    if not archive_created:
+        archive_filename = do_pack()
+        if not archive_filename:
             return False
-    else:
-        return do_deploy(archive_path)
+        archive_created = True  # set flag
+
+    results = execute(do_deploy, archive_path=archive_filename)
+
+    if False in results.values():
+        return False
+    return True
 
 
 def do_clean(number=0):
     """deletes out-of-date archives"""
-    if number == '0' or 0:
+    if int(number) <= 0:
         number = 1
     else:
         number = int(number)
@@ -115,7 +131,7 @@ def do_clean(number=0):
 
     releases_path = '/data/web_static/releases/'
     releases = run('ls -d {}web_static_*'.format(releases_path))
-    directories = releases.stdout.strip().split('\n')
+    directories = [dir.strip() for dir in releases.stdout.strip().split('\n')]
     directories.reverse()
     for directory in directories[number:]:
-        run('rm -rf {}{}'.format(releases_path, directory))
+        run('rm -rf {}/'.format(directory))
