@@ -16,7 +16,8 @@ def do_deploy(archive_path):
     if exists(archive_path) is False:
         return False
     file_archive = archive_path.split('/')[-1]
-    file_tgz = '/data/web_static/releases/' + "{}".format(file_archive.split('.')[0])
+    file_tgz = '/data/web_static/releases/' +\
+        "{}".format(file_archive.split('.')[0])
     tmp = "/tmp/" + file_archive
 
     try:
@@ -29,5 +30,5 @@ def do_deploy(archive_path):
         run("rm -rf /data/web_static/current")
         run("ln -s {}/ /data/web_static/current".format(file_tgz))
         return True
-    except:
+    except ValueError:
         return False
