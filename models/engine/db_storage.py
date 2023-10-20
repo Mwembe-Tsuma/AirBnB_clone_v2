@@ -31,6 +31,7 @@ class DBStorage:
             "mysql+mysqldb://{}:{}@{}/{}".format(
                 db_user, db_password, db_host, db_name
             ),
+            echo=True,
             pool_pre_ping=True,
         )
 
@@ -83,12 +84,12 @@ class DBStorage:
         - the option expire_on_commit must be set to False ;
         and scoped_session - to make sure your Session is thread-safe"""
 
-        from models.user import User
-        from models.place import Place
         from models.state import State
         from models.city import City
+        from models.place import Place
         from models.amenity import Amenity
         from models.review import Review
+        from models.user import User
 
         Base.metadata.create_all(self.__engine)
         Session = sessionmaker(
@@ -97,3 +98,7 @@ class DBStorage:
         )
         Session = scoped_session(Session)
         self.__session = Session()
+
+    def close(self):
+        """Call remove() on private session or close() on Session."""
+        self.__session.close()
