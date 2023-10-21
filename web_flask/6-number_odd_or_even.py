@@ -1,8 +1,11 @@
 #!/usr/bin/python3
 """This module starts a flask application with 6 routes."""
 
-from web_flask import app
 from flask import render_template
+from flask import Flask
+# from web_flask import app
+
+app = Flask(__name__,)
 
 
 @app.route('/', strict_slashes=False)
