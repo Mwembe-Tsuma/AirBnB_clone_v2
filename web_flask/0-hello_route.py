@@ -1,7 +1,10 @@
 #!/usr/bin/python3
 """This module starts a flask application."""
 
-from web_flask import app
+from flask import Flask
+# from web_flask import app
+
+app = Flask(__name__,)
 
 
 @app.route('/', strict_slashes=False)
@@ -10,4 +13,5 @@ def index():
     return 'Hello HBNB!'
 
 
-app.run(host='0.0.0.0', port=5000, debug=True)
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5000, debug=True)
