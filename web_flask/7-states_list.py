@@ -19,7 +19,6 @@ def teardown(exception):
 def states_list():
     """Diplay a list of states."""
     all_states = storage.all(State)
-    storage.close()
     return render_template('7-states_list.html', all_states=all_states)
 
 
