@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 """This module starts a flask web app, """
 
-from web_flask import app
 from flask import render_template
 from models import storage
 from models.state import State
