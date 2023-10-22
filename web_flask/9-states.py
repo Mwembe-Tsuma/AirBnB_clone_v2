@@ -8,16 +8,25 @@ app.url_map.strict_slashes = False
 
 @app.route('/states')
 def states_list():
-    states = storage.all("State")
-    return render_template("9-states.html", state=states)
+    current_id = "0"
+    all_states = storage.all(State)
+    states = sorted(all_states.values(), key=lambda state: state.name)
+    return render_template("9-states.html", states=states, current_id=current_id)
 
 
 @app.route('/states/<id>')
 def state_cities(id):
-    for state in storage.all("State").values():
-        if state.id == id:
-            return render_template("9-states.html", state=state)
-    return render_template("9-states.html")
+    current_id = "1"
+    all_state = storage.all(State)
+    key = "State" + "." + str(id)
+    try:
+        state = all_state[key]
+    except KeyError:
+        current_id = "2"
+        return render_template("9-states.html", current_id=current_id)
+    storage_type = getenv("HBNB_TYPE_STORAGE")
+    return render_template("9-states.html", state=state,
+                           storage_type=storage_type, current_id=current_id)
 
 
 @app.teardown_appcontext
