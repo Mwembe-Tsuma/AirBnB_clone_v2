@@ -10,19 +10,23 @@ class FileStorage:
 
     def all(self, cls=None):
         """Returns a dictionary of models currently in storage"""
-        obj = FileStorage.__objects
-        if cls is not None:
-            obj = {k: v for k, v in obj.items()
-                   if v.__class__ is cls}
-            return obj
-        return obj
+
+        if cls is None:
+            return FileStorage.__objects
+
+        my_dict = {}
+
+        for key, value in FileStorage.__objects.items():
+            if isinstance(value, cls):
+                my_dict[key] = value
+        return my_dict
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
         self.all().update({obj.to_dict()['__class__'] + '.' + obj.id: obj})
 
     def save(self):
-        """Saves storage to file"""
+        """Saves storage dictionary to file"""
         with open(FileStorage.__file_path, 'w') as f:
             temp = {}
             temp.update(FileStorage.__objects)
@@ -55,19 +59,17 @@ class FileStorage:
             pass
 
     def delete(self, obj=None):
-        """ removes an object from
-        a dictionary if it exists.
-        """
-        if obj is None or obj not in self.__objects.values():
+        """ Public instance method to delete an obj from the storge """
+        if obj is None:
             return
-        for ke, ob in FileStorage.__objects.items():
-            if ob is obj:
-                del FileStorage.__objects[ke]
-                FileStorage.save(obj)
-                break
+        key = "{}.{}".format(obj.__class__.__name__, obj.id)
+        if key in FileStorage.__objects:
+            del FileStorage.__objects[key]
+            self.save()
 
     def close(self):
         """
-        The close function reloads the current object.
+        Public method to call reload
+        for deserializing the JSON file
         """
         self.reload()
