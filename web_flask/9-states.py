@@ -2,7 +2,7 @@ from models import storage
 from flask import Flask
 from flask import render_template
 from os import getenv
-from models import storage
+from models.state import State
 
 app = Flask(__name__)
 
