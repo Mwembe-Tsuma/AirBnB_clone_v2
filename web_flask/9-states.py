@@ -23,8 +23,8 @@ def state_cities(id):
     try:
         state = all_state[key]
     except KeyError:
-        current_id = "2"
-        return render_template("9-states.html", current_id=current_id)
+        curr_id = "2"
+        return render_template("9-states.html", curr_id=curr_id)
     storage_type = getenv("HBNB_TYPE_STORAGE")
     return render_template("9-states.html", state=state,
                            storage_type=storage_type, current_id=current_id)
