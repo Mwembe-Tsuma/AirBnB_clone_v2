@@ -1,8 +1,12 @@
+#!/usr/bin/python3
+""""script that starts a Flask web application"""
+
 from models import storage
 from flask import Flask
 from flask import render_template
 from os import getenv
 from models.state import State
+
 
 app = Flask(__name__)
 
