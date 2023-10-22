@@ -1,6 +1,8 @@
 from models import storage
 from flask import Flask
 from flask import render_template
+from os import getenv
+from models import storage
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
