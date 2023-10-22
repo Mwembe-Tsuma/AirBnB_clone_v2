@@ -11,7 +11,8 @@ def states_list():
     current_id = "0"
     all_states = storage.all(State)
     states = sorted(all_states.values(), key=lambda state: state.name)
-    return render_template("9-states.html", states=states, current_id=current_id)
+    return render_template("9-states.html",
+                           states=states, current_id=current_id)
 
 
 @app.route('/states/<id>')
