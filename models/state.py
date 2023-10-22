@@ -10,6 +10,7 @@ from models.city import City
 class State(BaseModel, Base):
     """
      State class
+     The State class represents a state
     """
 
     __tablename__ = "states"
