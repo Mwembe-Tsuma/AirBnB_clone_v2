@@ -24,14 +24,15 @@ def states_list(id=None):
     all_states = storage.all(State)
     all_cities = None
     if id:
+        all_states = {
+                i: all_states[i] for i in all_states
+                if all_states[i].id == id}
         all_cities = storage.all(City)
         all_cities = {
                 i: all_cities[i] for i in all_cities
                 if all_cities[i].state_id == id
+                and list(all_states.values())[0].id == id
         }
-        all_states = {
-                i: all_states[i] for i in all_states
-                if all_states[i].id == id}
     template = '9-states.html'
     if request.path == '/states_list':
         template = '7-states_list.html'

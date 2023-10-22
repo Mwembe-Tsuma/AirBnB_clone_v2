@@ -1,46 +1,47 @@
 <!DOCTYPE html>
 <HTML lang="en">
-  <HEAD>
-    <TITLE>HBNB</TITLE>
-  </HEAD>
-  <BODY>
-    {%- if all_states -%}
-      {%- set len_states = all_states|length -%}
-      {%- if len_states == 1 -%}
+    <HEAD>
+        <TITLE>HBNB</TITLE>
+    </HEAD>
+    <BODY>
+        {%- if all_states -%}
+        {%- set len_states = all_states|length -%}
+        {%- if len_states == 1 -%}
         {% for state in all_states.values()|sort(attribute='name') %}
-          <H1>State: {{ state.name }}</H1>
+        <H1>State: {{ state.name }}</H1>
         {% endfor %}
         {%- if all_cities -%}
-          {%- set len_cities = all_cities|length -%}
-          {%- if len_cities == 0 -%}
-            <!-- Case: One state without city -->
-            <p>No cities found for this state.</p>
-          {%- elif len_cities == 1 -%}
-            <!-- Case: One state with one city -->
-            <H3>City:</H3>
+        {%- set len_cities = all_cities|length -%}
+        {%- if len_cities == 0 -%}
+        {#- <!-- Case: One state without city --> -#}
+        <p>No cities found for this state.</p>
+        {%- elif len_cities == 1 -%}
+        {#- <!-- Case: One state with one city --> -#}
+        <H3>City:</H3>
+        {% for city in all_cities.values()|sort(attribute='name') %}
+        <LI>{{ city.id}}: <B>{{ city.name }}</B></LI>
+        {% endfor %}
+        {%- else -%}
+        {#- <!-- Case: One state with cities --> -#}
+        <H3>Cities:</H3>
+        <UL>
             {% for city in all_cities.values()|sort(attribute='name') %}
-              <LI>{{ city.id}}: <B>{{ city.name }}</B></LI>
+            <LI>{{ city.id}}: <B>{{ city.name }}</B></LI>
             {% endfor %}
-          {%- else -%}
-            <!-- Case: One state with cities -->
-            <H3>Cities:</H3>
-            <UL>
-              {% for city in all_cities.values()|sort(attribute='name') %}
-                <LI>{{ city.id}}: <B>{{ city.name }}</B></LI>
-              {% endfor %}
-            </UL>
-          {%- endif -%}
+        </UL>
         {%- endif -%}
-      {% elif len_states > 1 %}
+        {%- endif -%}
+        {% elif len_states > 1 %}
+
         <H1>States</H1>
         <UL>
-          {% for state in all_states.values()|sort(attribute='name') %}
+            {% for state in all_states.values()|sort(attribute='name') %}
             <LI>{{ state.id}}: <B>{{ state.name }}</B></LI>
-          {% endfor %}
+            {% endfor %}
         </UL>
-      {% endif %}
-    {% else %}
-      <H1>Not found!</H1>
-    {% endif %}
-  </BODY>
+        {% endif %}
+        {% else %}
+        <H1>Not found!</H1>
+        {% endif %}
+    </BODY>
 </HTML>
